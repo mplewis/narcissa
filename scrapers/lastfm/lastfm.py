@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import config
+import narcissa_config
 
 import argparse
 import collections
@@ -8,6 +8,17 @@ import sys
 
 import dataset
 import requests
+
+
+# Enter your own username here.
+USERNAME = 'trickybeta'
+
+# These are the API parameters for our scraping requests.
+API_KEY = '5c14ae46a8579d7c453edf696ce5efed'
+PER_PAGE = 200
+
+# Database details.
+DB_TABLE = 'lastfm_tracks'
 
 
 api_url = ('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&'
@@ -19,7 +30,7 @@ def recent_tracks(user, page, limit):
     Get the most recent tracks from `user` using `api_key`.
     Start at page `page` and limit results to `limit`.
     """
-    return requests.get(api_url % (user, config.API_KEY, page, limit)).json()
+    return requests.get(api_url % (user, API_KEY, page, limit)).json()
 
 
 def flatten(d, parent_key=''):
@@ -100,11 +111,12 @@ def parse_args():
     return parser.parse_args()
 
 
-def exit_on_all_dupes(results):
-    """If all tracks from add_page_tracks' results were duplicates, exit."""
-    if results['num_skipped'] == config.PER_PAGE:
-        print('Found a page of all duplicates; stopping.')
-        sys.exit()
+def found_all_dupes(results):
+    """
+    Returns True if all tracks from add_page_tracks' results were
+    duplicates.
+    """
+    return results['num_skipped'] == PER_PAGE
 
 
 def scrape_page(page_num):
@@ -112,7 +124,7 @@ def scrape_page(page_num):
     Scrape the page at the given page number and return the results of adding
     all tracks from add_page_tracks.
     """
-    return recent_tracks(config.USERNAME, page_num, config.PER_PAGE)
+    return recent_tracks(USERNAME, page_num, PER_PAGE)
 
 
 def main():
@@ -120,8 +132,8 @@ def main():
     skip_duplicates = not args.all_tracks
     print('Skip duplicates:', skip_duplicates)
 
-    db = dataset.connect(config.DB_URI)
-    tracks = db[config.DB_TABLE]
+    db = dataset.connect(narcissa_config.DB_URI)
+    tracks = db[DB_TABLE]
 
     # We need to get the first page so we can find out how many total pages
     # there are in our listening history.
@@ -130,8 +142,8 @@ def main():
     total_pages = int(page['recenttracks']['@attr']['totalPages'])
     results = add_page_tracks(page, tracks, skip_duplicates=skip_duplicates)
     print(results)
-    if skip_duplicates:
-        exit_on_all_dupes(results)
+    if skip_duplicates and found_all_dupes(results):
+        return
 
     for page_num in range(1, total_pages + 1):
         print('Page', page_num, 'of', total_pages)
@@ -139,7 +151,8 @@ def main():
         results = add_page_tracks(page, tracks,
                                   skip_duplicates=skip_duplicates)
         print(results)
-        exit_on_all_dupes(results)
+        if skip_duplicates and found_all_dupes(results):
+            return
 
     # Confirm our tracks were inserted into the database
     print('Done!', len(tracks), 'rows in table `tracks`.')
