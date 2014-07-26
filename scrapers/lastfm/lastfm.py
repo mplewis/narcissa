@@ -4,7 +4,6 @@ import narcissa_config
 
 import argparse
 import collections
-import sys
 
 import dataset
 import requests
