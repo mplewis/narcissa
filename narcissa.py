@@ -1,31 +1,34 @@
 #!/usr/bin/env python3
 
-import narcissa_config
-from scrapers.utils import list_scrapers
-from server import server
+import config
 
-import sys
-
-
-SCRAPERS_DIR = 'scrapers'
+import subprocess
+import atexit
+import schedule
+from time import sleep
+from glob import glob
 
 
 def start_scrapers():
-    scrapers = list_scrapers(search_dir=SCRAPERS_DIR)
-    for scraper in scrapers:
-        module_meta = (SCRAPERS_DIR, scraper, scraper)
-        exec('from %s.%s import %s' % module_meta)
-        module = sys.modules['%s.%s.%s' % module_meta]
-        interval = narcissa_config.SCRAPER_INTERVALS[scraper]
-        print('Running every %s seconds: %s' % (interval, module))
-        module.main()
+    for scraper in glob('scrapers/*.py'):
+        with open(scraper) as f:
+            exec(f.read())
 
 
 def start_server():
-    print('Starting server: %s' % server)
-    server.app.run()
+    cmd = 'waitress-serve --port=5000 server:app'
+    p = subprocess.Popen(cmd.split(), cwd='server')
+    return p
+
+
+def kill_process(subprocess):
+    subprocess.terminate()
 
 
 if __name__ == '__main__':
     start_scrapers()
-    start_server()
+    server = start_server()
+    atexit.register(kill_process, server)
+    while True:
+        schedule.run_pending()
+        sleep(1)
