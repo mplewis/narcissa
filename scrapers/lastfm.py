@@ -1,7 +1,7 @@
 scheduler = globals()['scheduler']
 
 
-def lastfm():
+def scrape_lastfm():
     # Enter your own username here.
     USERNAME = 'trickybeta'
 
@@ -126,5 +126,5 @@ def lastfm():
     print('Done! %s tracks added.' % total_tracks_added)
 
 
-scheduler.every(10).minutes.do(lastfm)
-lastfm()
+scheduler.every(10).minutes.do(scrape_lastfm)
+scrape_lastfm()
