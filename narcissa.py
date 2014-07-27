@@ -6,12 +6,15 @@ from schedule import Scheduler
 from time import sleep
 from glob import glob
 
+
 META_IMPORT = '# narcissa import '
+scheduler = Scheduler()
 
 
 def start_scrapers():
     for scraper_path in glob('scrapers/*.py'):
         with open(scraper_path) as f:
+            print(scraper_path)
             scraper_data = f.read()
             exec(scraper_data)
 
@@ -22,15 +25,10 @@ def start_server():
     return p
 
 
-def kill_process(subprocess):
-    subprocess.terminate()
-
-
 def main():
-    scheduler = Scheduler()
     start_scrapers()
     server = start_server()
-    atexit.register(kill_process, server)
+    atexit.register(server.terminate)
     while True:
         scheduler.run_pending()
         sleep(1)
