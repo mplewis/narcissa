@@ -1,9 +1,12 @@
-print("Hello, I'm test.py.")
-print('DB_URI: %s' % config.DB_URI)
+scheduler = globals()['scheduler']
 
 
 def scrape_test():
-    print('Scrape Test')
+    import config
+    print("Hello, I'm test.py.")
+    print('DB_URI: %s' % config.DB_URI)
+    print('Thanks!')
 
 
-schedule.every(3).seconds.do(scrape_test)
+scheduler.every(3).seconds.do(scrape_test)
+scrape_test()

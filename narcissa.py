@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 
-import config
-
 import subprocess
 import atexit
-import schedule
+from schedule import Scheduler
 from time import sleep
 from glob import glob
 
+META_IMPORT = '# narcissa import '
+
 
 def start_scrapers():
-    for scraper in glob('scrapers/*.py'):
-        with open(scraper) as f:
-            exec(f.read())
+    for scraper_path in glob('scrapers/*.py'):
+        with open(scraper_path) as f:
+            scraper_data = f.read()
+            exec(scraper_data)
 
 
 def start_server():
@@ -25,10 +26,15 @@ def kill_process(subprocess):
     subprocess.terminate()
 
 
-if __name__ == '__main__':
+def main():
+    scheduler = Scheduler()
     start_scrapers()
     server = start_server()
     atexit.register(kill_process, server)
     while True:
-        schedule.run_pending()
+        scheduler.run_pending()
         sleep(1)
+
+
+if __name__ == '__main__':
+    main()
