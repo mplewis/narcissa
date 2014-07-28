@@ -9,6 +9,9 @@ sys.path.insert(0, parent_dir)
 import config
 
 import sqlite3
+from time import time
+from traceback import print_exc
+from multiprocessing import Process, Queue
 from flask import Flask, request, jsonify
 
 
@@ -16,27 +19,16 @@ app = Flask(__name__)
 
 os.chdir(parent_dir)
 print(os.getcwd())
-conn = sqlite3.connect(config.DB_URI_READ_ONLY, uri=True)
 
 
-@app.route('/', methods=['GET'])
-def hello_world():
-    return 'Hello World!'
-
-
-@app.route('/', methods=['POST'])
-def sql_query():
-    if 'query' not in request.form:
-        err = {'error': 'No query provided. Post SQL queries as '
-                        'form URL-encoded param "query".'}
-        return jsonify(err), 400
-    query = request.form['query']
-
+def query_processor(conn, query, result_queue):
     try:
+        start_time = time()
         results = conn.execute(query)
+        query_time = time() - start_time
     except sqlite3.OperationalError as e:
-        err = {'error': repr(e)}
-        return jsonify(err), 400
+        result_queue.put(e)
+        return
 
     column_names = [n[0] for n in results.description]
     named_results = []
@@ -46,9 +38,50 @@ def sql_query():
             named_row[column_names[num]] = cell
         named_results.append(named_row)
 
-    output = {'rows': named_results}
-    return jsonify(output)
+    output = {'results': named_results, 'query_time_sec': query_time}
+    result_queue.put(output)
 
+
+@app.route('/', methods=['GET'])
+def hello_world():
+    return 'Hello World!'
+
+
+@app.route('/', methods=['POST'])
+def sql_query():
+    try:
+        if 'query' not in request.form:
+            err = {'error': 'No query provided. Post SQL queries as '
+                            'form URL-encoded param "query".'}
+            return jsonify(err), 400
+        query = request.form['query']
+
+        conn = sqlite3.connect(config.DB_URI_READ_ONLY, uri=True)
+        result_queue = Queue()
+
+        query_process = Process(target=query_processor,
+                                args=(conn, query, result_queue))
+        query_process.start()
+        query_process.join(config.QUERY_TIMEOUT_SECS)
+
+        if query_process.is_alive():
+            query_process.terminate()
+            err = {'error': 'Query took too long; max time %s seconds' %
+                            config.QUERY_TIMEOUT_SECS}
+            return jsonify(err), 400
+
+        output = result_queue.get()
+
+        if type(output) is sqlite3.OperationalError:
+            err = {'error': repr(output)}
+            return jsonify(err), 400
+
+        return jsonify(output)
+
+    except Exception:
+        # It's a little hacky but it lets us get proper tracebacks from the
+        # server, even without debug mode
+        print_exc()
 
 if __name__ == '__main__':
     app.run()
