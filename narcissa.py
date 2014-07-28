@@ -3,13 +3,13 @@
 import subprocess
 import atexit
 import sys
-from schedule import Scheduler
+from utils.safe_schedule import SafeScheduler
 from time import sleep
 from glob import glob
 
 
 META_IMPORT = '# narcissa import '
-scheduler = Scheduler()
+scheduler = SafeScheduler()
 
 
 def make_exit_graceful():
