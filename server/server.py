@@ -26,8 +26,18 @@ def hello_world():
 
 @app.route('/', methods=['POST'])
 def sql_query():
+    if 'query' not in request.form:
+        err = {'error': 'No query provided. Post SQL queries as '
+                        'form URL-encoded param "query".'}
+        return jsonify(err), 400
     query = request.form['query']
-    results = conn.execute(query)
+
+    try:
+        results = conn.execute(query)
+    except sqlite3.OperationalError as e:
+        err = {'error': repr(e)}
+        return jsonify(err), 400
+
     column_names = [n[0] for n in results.description]
     named_results = []
     for row in results:
@@ -35,6 +45,7 @@ def sql_query():
         for num, cell in enumerate(row):
             named_row[column_names[num]] = cell
         named_results.append(named_row)
+
     output = {'rows': named_results}
     return jsonify(output)
 
