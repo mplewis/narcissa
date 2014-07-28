@@ -112,6 +112,8 @@ def scrape_lastfm():
     total_tracks_added = tracks_added
     tracks_were_added = tracks_added > 0
 
+    print('%s track(s) added.' % tracks_added)
+
     for page_num in range(1, total_pages + 1):
         while tracks_were_added:
             print('Page', page_num + 1, 'of', total_pages)
@@ -122,8 +124,10 @@ def scrape_lastfm():
             total_tracks_added += tracks_added
             tracks_were_added = tracks_added > 0
 
+            print('%s track(s) added.' % tracks_added)
+
     # Confirm our tracks were inserted into the database
-    print('Done! %s tracks added.' % total_tracks_added)
+    print('Done! %s track(s) added.' % total_tracks_added)
 
 
 scheduler.every(10).minutes.do(scrape_lastfm)
