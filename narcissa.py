@@ -2,6 +2,7 @@
 
 import subprocess
 import atexit
+import sys
 from schedule import Scheduler
 from time import sleep
 from glob import glob
@@ -9,6 +10,24 @@ from glob import glob
 
 META_IMPORT = '# narcissa import '
 scheduler = Scheduler()
+
+
+def make_exit_graceful():
+    original_hook = sys.excepthook
+
+    def new_hook(type, value, traceback):
+        if type == KeyboardInterrupt:
+            sys.exit("\nBye for now!")
+        else:
+            original_hook(type, value, traceback)
+
+    sys.excepthook = new_hook
+
+
+def start_server():
+    cmd = 'waitress-serve --port=5000 server:app'
+    p = subprocess.Popen(cmd.split(), cwd='server')
+    return p
 
 
 def start_scrapers():
@@ -19,16 +38,11 @@ def start_scrapers():
             exec(scraper_data)
 
 
-def start_server():
-    cmd = 'waitress-serve --port=5000 server:app'
-    p = subprocess.Popen(cmd.split(), cwd='server')
-    return p
-
-
 def main():
-    start_scrapers()
+    make_exit_graceful()
     server = start_server()
     atexit.register(server.terminate)
+    start_scrapers()
     while True:
         scheduler.run_pending()
         sleep(1)
