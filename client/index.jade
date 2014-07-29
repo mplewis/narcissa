@@ -4,5 +4,16 @@ block body
   div.container
     div.row
       div.col-md-12
-        h1 Hello world.
-        p I'm Narcissa. I track what you do.
+        h1 I'm Narcissa.
+        p I track what you do.
+    div.row
+      div.col-md-12
+        h2 Recent Runs
+        ul(data-bind="foreach: activities, visible: activities().length > 0")
+          li
+            p(data-bind="text: name")
+
+block scripts
+  script(src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js")
+  script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-debug.js")
+  script(src="/scripts/narcissa.js")
