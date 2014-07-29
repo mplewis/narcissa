@@ -17,6 +17,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+
 os.chdir(parent_dir)
 print(os.getcwd())
 
@@ -40,6 +41,13 @@ def query_processor(conn, query, result_queue):
 
     output = {'results': named_results, 'query_time_sec': query_time}
     result_queue.put(output)
+
+
+@app.after_request
+def allow_cors(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+    return response
 
 
 @app.route('/', methods=['GET'])
