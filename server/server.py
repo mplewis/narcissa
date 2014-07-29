@@ -8,10 +8,12 @@ sys.path.insert(0, parent_dir)
 
 import config
 
+import json
 import sqlite3
 from time import time
 from traceback import print_exc
 from multiprocessing import Process, Queue
+
 from flask import Flask, request, jsonify
 
 
@@ -43,6 +45,30 @@ def query_processor(conn, query, result_queue):
     result_queue.put(output)
 
 
+def query_results(query):
+    conn = sqlite3.connect(config.DB_URI_READ_ONLY, uri=True)
+    result_queue = Queue()
+
+    query_process = Process(target=query_processor,
+                            args=(conn, query, result_queue))
+    query_process.start()
+    query_process.join(config.QUERY_TIMEOUT_SECS)
+
+    if query_process.is_alive():
+        query_process.terminate()
+        err = {'error': 'Query took too long; max time %s seconds' %
+                        config.QUERY_TIMEOUT_SECS}
+        return err
+
+    output = result_queue.get()
+
+    if type(output) is sqlite3.OperationalError:
+        err = {'error': repr(output)}
+        return err
+
+    return output
+
+
 @app.after_request
 def allow_cors(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
@@ -51,41 +77,18 @@ def allow_cors(response):
 
 
 @app.route('/', methods=['GET'])
-def hello_world():
-    return 'Hello World!'
+def hello():
+    return ('Hello. I\'m a Narcissa server. <a href="https://github.com/'
+            'mplewis/narcissa">Learn more</a>.')
 
 
 @app.route('/', methods=['POST'])
-def sql_query():
+def sql_queries():
     try:
-        if 'query' not in request.form:
-            err = {'error': 'No query provided. Post SQL queries as '
-                            'form URL-encoded param "query".'}
-            return jsonify(err), 400
-        query = request.form['query']
-
-        conn = sqlite3.connect(config.DB_URI_READ_ONLY, uri=True)
-        result_queue = Queue()
-
-        query_process = Process(target=query_processor,
-                                args=(conn, query, result_queue))
-        query_process.start()
-        query_process.join(config.QUERY_TIMEOUT_SECS)
-
-        if query_process.is_alive():
-            query_process.terminate()
-            err = {'error': 'Query took too long; max time %s seconds' %
-                            config.QUERY_TIMEOUT_SECS}
-            return jsonify(err), 400
-
-        output = result_queue.get()
-
-        if type(output) is sqlite3.OperationalError:
-            err = {'error': repr(output)}
-            return jsonify(err), 400
-
-        return jsonify(output)
-
+        results = {}
+        for name, query in request.form.items():
+            results[name] = query_results(query)
+        return jsonify(results)
     except Exception:
         # It's a little hacky but it lets us get proper tracebacks from the
         # server, even without debug mode

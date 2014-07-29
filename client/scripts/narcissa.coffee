@@ -20,8 +20,8 @@ queries = {
     .limit(5)
   addictiveTracks: '
     SELECT
-      fp.name AS name, fp.artist_text AS artist_text, fp.album_text AS album_text,
-      fp.date_uts AS date_uts, fp.url AS url
+      fp.name AS name, fp.artist_text AS artist_text,
+      fp.album_text AS album_text, fp.date_uts AS date_uts, fp.url AS url
     FROM
       (SELECT * FROM lastfm_tracks GROUP BY url ORDER BY date_uts) fp
     INNER JOIN lastfm_tracks ap ON
@@ -75,36 +75,21 @@ NarcissaViewModel = () ->
   self = this
   
   self.activities = ko.observableArray []
-  $.post(
-    'http://localhost:5000/'
-    {'query': queryStrings.activities}
-    (data) ->
-      console.log data.query_time_sec
-      self.activities(_.map data.results, (result) -> new Activity(result))
-      return
-  ).fail (jqXHR) ->
-    console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
-    return
-  
   self.recentTracks = ko.observableArray []
-  $.post(
-    'http://localhost:5000/'
-    {'query': queryStrings.recentTracks}
-    (data) ->
-      console.log data.query_time_sec
-      self.recentTracks(_.map data.results, (result) -> new Track(result))
-      return
-  ).fail (jqXHR) ->
-    console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
-    return
-  
   self.addictiveTracks = ko.observableArray []
+  
   $.post(
     'http://localhost:5000/'
-    {'query': queryStrings.addictiveTracks}
+    {
+      'activities': queryStrings.activities,
+      'recentTracks': queryStrings.recentTracks,
+      'addictiveTracks': queryStrings.addictiveTracks
+    }
     (data) ->
-      console.log data.query_time_sec
-      self.addictiveTracks(_.map data.results, (result) -> new Track(result))
+      console.log data
+      self.activities(_.map data.activities.results, (result) -> new Activity(result))
+      self.recentTracks(_.map data.recentTracks.results, (result) -> new Track(result))
+      self.addictiveTracks(_.map data.addictiveTracks.results, (result) -> new Track(result))
       return
   ).fail (jqXHR) ->
     console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
