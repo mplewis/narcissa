@@ -9,6 +9,29 @@ queries = {
     .field('polyline')
     .order('start_date', false)
     .limit(3)
+  recentTracks: squel.select()
+    .from('lastfm_tracks')
+    .field('name')
+    .field('artist_text')
+    .field('album_text')
+    .field('date_uts')
+    .field('url')
+    .order('date_uts', false)
+    .limit(5)
+  addictiveTracks: '
+    SELECT
+      fp.name AS name, fp.artist_text AS artist_text, fp.album_text AS album_text,
+      fp.date_uts AS date_uts, fp.url AS url
+    FROM
+      (SELECT * FROM lastfm_tracks GROUP BY url ORDER BY date_uts) fp
+    INNER JOIN lastfm_tracks ap ON
+      fp.url = ap.url AND
+      ap.date_uts - fp.date_uts <= (86400 * 7)
+    GROUP BY ap.url
+    HAVING COUNT(ap.url) > 3
+    ORDER BY ap.date_uts DESC
+    LIMIT 5
+  '
 }
 
 queryStrings = {}
@@ -33,20 +56,60 @@ Activity = (data) ->
   )
   return
 
-ActivityListViewModel = () ->
+Track = (data) ->
   self = this
-  self.activities = ko.observableArray []
+  self.name = data.name
+  self.artist_text = data.artist_text
+  self.album_text = data.album_text
+  self.date_uts = data.date_uts
+  self.url = data.url
+  self.summary = ko.computed( () ->
+    if (self.album_text)
+      sprintf('%s - %s (from %s)', self.artist_text, self.name, self.album_text)
+    else
+      sprintf('%s - %s', self.artist_text, self.name)
+  )
+  return
+
+NarcissaViewModel = () ->
+  self = this
   
+  self.activities = ko.observableArray []
   $.post(
     'http://localhost:5000/'
     {'query': queryStrings.activities}
     (data) ->
-      mappedActivities = _.map data.results, (result) ->
-        new Activity(result)
-      self.activities(mappedActivities)
+      console.log data.query_time_sec
+      self.activities(_.map data.results, (result) -> new Activity(result))
       return
-  )
+  ).fail (jqXHR) ->
+    console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
+    return
+  
+  self.recentTracks = ko.observableArray []
+  $.post(
+    'http://localhost:5000/'
+    {'query': queryStrings.recentTracks}
+    (data) ->
+      console.log data.query_time_sec
+      self.recentTracks(_.map data.results, (result) -> new Track(result))
+      return
+  ).fail (jqXHR) ->
+    console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
+    return
+  
+  self.addictiveTracks = ko.observableArray []
+  $.post(
+    'http://localhost:5000/'
+    {'query': queryStrings.addictiveTracks}
+    (data) ->
+      console.log data.query_time_sec
+      self.addictiveTracks(_.map data.results, (result) -> new Track(result))
+      return
+  ).fail (jqXHR) ->
+    console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
+    return
 
   return
 
-ko.applyBindings new ActivityListViewModel()
+ko.applyBindings new NarcissaViewModel()

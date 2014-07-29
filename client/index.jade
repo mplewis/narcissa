@@ -1,4 +1,7 @@
-include _base_layout
+extends _base_layout
+
+block title
+  | Hello
 
 block body
   div.container
@@ -12,6 +15,18 @@ block body
         ul(data-bind="foreach: activities, visible: activities().length > 0")
           li
             p(data-bind="text: summary")
+    div.row
+      div.col-md-12
+        h2 Recent Tracks
+        ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
+          li
+            a(data-bind="attr: {href: url}, text: summary")
+    div.row
+      div.col-md-12
+        h2 Addictive Tracks
+        ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
+          li
+            a(data-bind="attr: {href: url}, text: summary")
 
 block scripts
   script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-debug.js")
