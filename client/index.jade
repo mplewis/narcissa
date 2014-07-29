@@ -11,9 +11,11 @@ block body
         h2 Recent Runs
         ul(data-bind="foreach: activities, visible: activities().length > 0")
           li
-            p(data-bind="text: name")
+            p(data-bind="text: summary")
 
 block scripts
-  script(src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js")
   script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-debug.js")
+  script(src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js")
+  script(src="//cdnjs.cloudflare.com/ajax/libs/sprintf/0.0.7/sprintf.min.js")
+  script(src="/scripts/vendor/squel.min.js")
   script(src="/scripts/narcissa.js")
