@@ -13,8 +13,7 @@ block body
       div.col-md-12
         h2 Recent Runs
         ul(data-bind="foreach: activities, visible: activities().length > 0")
-          li
-            p(data-bind="text: summary")
+          li(data-bind="text: summary")
     div.row
       div.col-md-12
         h2 Recent Tracks
