@@ -29,10 +29,6 @@ queries = {
     .field('album_text')
     .field('date_uts')
     .field('url')
-    .where('
-      album_mbid IS NOT NULL OR
-      (artist_text IS NOT NULL AND album_text IS NOT NULL)
-    ')
     .order('date_uts', false)
     .limit(3)
   addictiveTracks: sprintf '
