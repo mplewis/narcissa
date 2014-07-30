@@ -3,34 +3,49 @@ extends _base_layout
 block title
   | Hello
 
+block head
+  script(src="/assets/vendor/polymer/platform/platform.js")
+  link(rel="import", href="/assets/vendor/polymer/")
+
 block body
   div.container
     div.row
       div.col-md-12
-        h1 I'm Narcissa.
-        p I track what you do.
-    div.row
-      div.col-md-12(data-bind="with: currentPlace")
-        h2 Where I Am
-        p(data-bind="text: place_name")
-        p.timeago(data-bind="text: here_since")
-    div.row
-      div.col-md-12
-        h2 Recent Runs
-        ul(data-bind="foreach: activities, visible: activities().length > 0")
-          li(data-bind="text: summary")
-    div.row
-      div.col-md-12
-        h2 Recent Tracks
-        ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
-          li
-            a(data-bind="attr: {href: url}, text: summary")
-    div.row
-      div.col-md-12
-        h2 Addictive Tracks
-        ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
-          li
-            a(data-bind="attr: {href: url}, text: summary")
+        h1 This is Narcissa.
+        p She tracks how I live.
+    span.loading(data-bind="visible: !showUI()")
+      h2 Stalking...
+    span.ui(data-bind="visible: showUI")
+      div.row
+        div.col-md-4(data-bind="with: currentPlace")
+          h2 This is where I am right now.
+          p(data-bind="text: place_name")
+          p.timeago(data-bind="text: here_since")
+        div.col-md-4(data-bind="with: lastActivity")
+          h2 This is where my last workout took me.
+          ul
+            li(data-bind="text: type")
+            li
+              | "
+              span(data-bind="text: name")
+              | "
+            li
+              | Pace: 
+              span(data-bind="text: pace_mins_per_mi")
+              |  per mile
+            li
+              span(data-bind="text: distance_mi")
+              |  miles
+        div.col-md-4
+          h2 These are the last songs I played.
+          ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
+            li
+              a(data-bind="attr: {href: url}, text: summary")
+        div.col-md-4
+          h2 Recently I've been listening to these songs a lot.
+          ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
+            li
+              a(data-bind="attr: {href: url}, text: summary")
 
 block scripts
   script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js")

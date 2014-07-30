@@ -1,7 +1,19 @@
 sevenDaysAgo = Date.today().add(-3).days().valueOf() / 1000
 
+min_to_m_ss = (min_frac) ->
+  console.log(min_frac)
+  sprintf '%d:%02d', Math.floor(min_frac), 60 * (min_frac % 1)
+
 queries = {
-  activities: squel.select()
+  currentPlace: squel.select()
+    .from('moves_places')
+    .field('startTime')
+    .field('place_name')
+    .field('place_location_lat')
+    .field('place_location_lon')
+    .order('startTime', false)
+    .limit(1)
+  lastActivity: squel.select()
     .from('strava_activities')
     .field('name')
     .field('type')
@@ -10,7 +22,7 @@ queries = {
     .field('pace_mins_per_mi')
     .field('polyline')
     .order('start_date', false)
-    .limit(3)
+    .limit(1)
   recentTracks: squel.select()
     .from('lastfm_tracks')
     .field('name')
@@ -18,8 +30,12 @@ queries = {
     .field('album_text')
     .field('date_uts')
     .field('url')
+    .where('
+      album_mbid IS NOT NULL OR
+      (artist_text IS NOT NULL AND album_text IS NOT NULL)
+    ')
     .order('date_uts', false)
-    .limit(5)
+    .limit(3)
   addictiveTracks: sprintf '
     SELECT
       fp.name AS name, fp.artist_text AS artist_text,
@@ -35,16 +51,8 @@ queries = {
     GROUP BY ap.url
     HAVING COUNT(ap.url) > 3
     ORDER BY ap.date_uts DESC
-    LIMIT 5
+    LIMIT 3
   ', {earliestDate: sevenDaysAgo}
-  currentPlace: squel.select()
-    .from('moves_places')
-    .field('startTime')
-    .field('place_name')
-    .field('place_location_lat')
-    .field('place_location_lon')
-    .order('startTime', false)
-    .limit(1)
 }
 
 queryStrings = {}
@@ -60,18 +68,9 @@ Activity = (data) ->
   self.name = data.name
   self.type = data.type
   self.start_date = data.start_date
-  self.distance_mi = data.distance_mi
-  self.pace_mins_per_mi = data.pace_mins_per_mi
+  self.distance_mi = sprintf '%.02f', data.distance_mi
+  self.pace_mins_per_mi = min_to_m_ss(data.pace_mins_per_mi)
   self.polyline = data.polyline
-  self.summary = ko.computed( () ->
-    ago = $.timeago new Date self.start_date
-    pace_min_sec =
-      sprintf '%02d:%02d',
-      Math.floor(self.pace_mins_per_mi),
-      60 * (self.pace_mins_per_mi % 1)
-    sprintf '%s, %s, %s, %s/mi',
-      self.type, self.name, ago, pace_min_sec
-  )
   return
 
 Track = (data) ->
@@ -101,28 +100,37 @@ Place = (data) ->
 
 NarcissaViewModel = () ->
   self = this
-  
-  self.activities = ko.observableArray []
+
+  self.showUI = ko.observable false
+
+  self.about = ko.observable()
+
+  self.currentPlace = ko.observable()
+  self.lastActivity = ko.observable()
   self.recentTracks = ko.observableArray []
   self.addictiveTracks = ko.observableArray []
-  self.currentPlace = ko.observable()
-  
+
+  $.get(
+    '/data/whoami.json'
+    (data) ->
+      console.log data
+  )
+
   $.post(
     'http://localhost:5000/'
     {
-      'activities': queryStrings.activities,
+      'currentPlace': queryStrings.currentPlace
+      'lastActivity': queryStrings.lastActivity,
       'recentTracks': queryStrings.recentTracks,
       'addictiveTracks': queryStrings.addictiveTracks,
-      'currentPlace': queryStrings.currentPlace
     }
     (data) ->
-      self.activities(_.map data.activities.results,
-                      (result) -> new Activity result)
+      self.currentPlace new Place data.currentPlace.results[0]
+      self.lastActivity new Activity data.lastActivity.results[0]
       self.recentTracks(_.map data.recentTracks.results,
                         (result) -> new Track result)
       self.addictiveTracks(_.map data.addictiveTracks.results,
                            (result) -> new Track result)
-      self.currentPlace new Place data.currentPlace.results[0]
       _.each(_.pairs(data), (pair) ->
         name = pair[0]
         queryTime = pair[1].query_time_sec
@@ -132,6 +140,8 @@ NarcissaViewModel = () ->
           console.log sprintf '%s: cached', name
         return
       )
+      makeVis = () -> self.showUI true; return
+      setTimeout makeVis, 1000
       return
   ).fail (jqXHR) ->
     console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
