@@ -10,6 +10,11 @@ block body
         h1 I'm Narcissa.
         p I track what you do.
     div.row
+      div.col-md-12(data-bind="with: currentPlace")
+        h2 Where I Am
+        p(data-bind="text: place_name")
+        p.timeago(data-bind="text: here_since")
+    div.row
       div.col-md-12
         h2 Recent Runs
         ul(data-bind="foreach: activities, visible: activities().length > 0")
