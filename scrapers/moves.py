@@ -7,7 +7,7 @@ def scrape_moves():
     import collections
     import json
     import webbrowser
-    import dateutil.parser
+    from dateutil.parser import parse
     from cgi import parse_qs
     from wsgiref.simple_server import make_server
 
@@ -120,8 +120,7 @@ def scrape_moves():
             for segment in day['segments']:
                 # Parse then rewrite times to ensure they're consistent
                 for prop in ['startTime', 'lastUpdate', 'endTime']:
-                    segment[prop] = (dateutil.parser.parse(segment[prop])
-                                     .isoformat())
+                    segment[prop] = parse(segment[prop]).isoformat()
                 segment = flatten(segment)
                 # Flatten foursquareCategoryIds lists
                 if FSQ_PROP in segment:
@@ -131,11 +130,9 @@ def scrape_moves():
                     segment_start_times.add(segment['startTime'])
                     all_segments.append(segment)
 
-        recent_segments = sorted(
-            all_segments,
-            key=lambda seg: dateutil.parser.parse(seg['startTime']),
-            reverse=True
-        )
+        recent_segments = sorted(all_segments,
+                                 key=lambda seg: parse(seg['startTime']),
+                                 reverse=True)
         num_segments = len(recent_segments)
 
         segments_added = 0
