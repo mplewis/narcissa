@@ -98,6 +98,9 @@ def scrape_lastfm():
         adding all tracks from add_page_tracks.
         """
         return recent_tracks(USERNAME, page_num, PER_PAGE)
+
+    print('Querying Last.fm...')
+
     db = dataset.connect(config.DB_URI)
     tracks = db[DB_TABLE]
 
