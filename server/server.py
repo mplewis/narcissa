@@ -21,7 +21,6 @@ app = Flask(__name__)
 
 
 os.chdir(parent_dir)
-print(os.getcwd())
 
 
 def query_processor(conn, query, result_queue):
