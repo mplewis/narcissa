@@ -8,9 +8,11 @@ sys.path.insert(0, parent_dir)
 
 import config
 
-import json
 import sqlite3
+import hashlib
 from time import time
+from copy import copy
+from datetime import datetime
 from traceback import print_exc
 from multiprocessing import Process, Queue
 
@@ -21,6 +23,50 @@ app = Flask(__name__)
 
 
 os.chdir(parent_dir)
+
+
+def md5(input):
+    h = hashlib.md5()
+    h.update(input.encode('utf-8'))
+    return h.digest()
+
+
+class QueryResult:
+    def __init__(self, query_hash, result):
+        self.query_hash = query_hash
+        self.result = copy(result)
+        self.updated = datetime.now()
+        if 'query_time_sec' in self.result:
+            del self.result['query_time_sec']
+
+
+class QueryResultsCache:
+    def __init__(self, expiry=60):
+        self.expiry = expiry
+        self._queries = {}
+
+    def query_results(self, query):
+        query_hash = md5(query)
+
+        if query_hash not in self._queries:
+            r = query_results(query)
+            self._queries[query_hash] = QueryResult(query_hash, r)
+            return r
+
+        cached = self._queries[query_hash]
+        then = cached.updated
+        now = datetime.now()
+
+        until_expiry = (now - then).total_seconds()
+        if until_expiry < self.expiry:
+            return cached.result
+        else:
+            r = query_results(query)
+            self._queries[query_hash] = QueryResult(query_hash, r)
+            return r
+
+
+cache = QueryResultsCache(expiry=config.QUERY_CACHE_EXPIRY_SECS)
 
 
 def query_processor(conn, query, result_queue):
@@ -86,7 +132,7 @@ def sql_queries():
     try:
         results = {}
         for name, query in request.form.items():
-            results[name] = query_results(query)
+            results[name] = cache.query_results(query)
         return jsonify(results)
     except Exception:
         # It's a little hacky but it lets us get proper tracebacks from the
