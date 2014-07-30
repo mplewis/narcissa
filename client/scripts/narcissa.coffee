@@ -1,7 +1,6 @@
 sevenDaysAgo = Date.today().add(-3).days().valueOf() / 1000
 
 min_to_m_ss = (min_frac) ->
-  console.log(min_frac)
   sprintf '%d:%02d', Math.floor(min_frac), 60 * (min_frac % 1)
 
 queries = {
@@ -141,10 +140,24 @@ NarcissaViewModel = () ->
         return
       )
       self.showUI true
+
+      currPlaceMap = L.mapbox.map 'map-current-place', 'mplewis.j3i59a6a'
+      lastWorkoutMap = L.mapbox.map 'map-last-workout', 'mplewis.j3i59a6a'
+
+      rawCurrPlace = data.currentPlace.results[0]
+      rawLastAct = data.lastActivity.results[0]
+
+      currPlace = [rawCurrPlace.place_location_lat, rawCurrPlace.place_location_lon]
+
+      currPlaceMap.setView currPlace, 14
+      L.marker(currPlace).addTo(currPlaceMap)
+
+      workoutPoly = L.Polyline.fromEncoded(rawLastAct.polyline, {color: 'teal'}).addTo lastWorkoutMap
+      lastWorkoutMap.fitBounds(workoutPoly.getBounds())
+
   ).fail (jqXHR) ->
     console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
     return
-
   return
 
 ko.applyBindings new NarcissaViewModel()

@@ -4,52 +4,61 @@ block title
   | Hello
 
 block head
-  <script type="text/javascript" src="//use.typekit.net/qhz6bju.js"></script>
-  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+  script(type="text/javascript" src="//use.typekit.net/qhz6bju.js")
+  script(type="text/javascript").
+    try{Typekit.load();}catch(e){}
+  script(src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js')
+  link(href='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css' rel='stylesheet')
 
 block body
   div.container
     div.row
       div.col-md-6.col-md-offset-3.narcissa-intro
-        h1 This is Narcissa.
-        p She helps me track how I live.
+        h1 Narcissa
+        p tracks how I live daily.
         hr
     span.narcissa-ui(data-bind="visible: !showUI()")
-      h1 Stalking...
+      div.row
+        div.col-md-6.col-md-offset-3
+          h1 Stalking...
     span.narcissa-ui(data-bind="visible: showUI")
       div.row
-        div.col-md-6.col-md-offset-3.narcissa-item(data-bind="with: currentPlace")
-          h1 This is where Matt is right now.
-          p(data-bind="text: place_name")
-          p.timeago(data-bind="text: here_since")
+        div.col-md-6
+          span.narcissa-item(data-bind="with: currentPlace")
+            h1 This is where Matt is right now.
+            div#map-current-place.map
+            p(data-bind="text: place_name")
+            p.timeago(data-bind="text: here_since")
+        div.col-md-6
+          span.narcissa-item(data-bind="with: lastActivity")
+            h1 Here's where Matt's last workout took him.
+            div#map-last-workout.map
+            ul
+              li(data-bind="text: type")
+              li
+                | "
+                span(data-bind="text: name")
+                | "
+              li
+                | Pace: 
+                span(data-bind="text: pace_mins_per_mi")
+                |  per mile
+              li
+                span(data-bind="text: distance_mi")
+                |  miles
       div.row
-        div.col-md-6.col-md-offset-3.narcissa-item(data-bind="with: lastActivity")
-          h1 Here's where Matt's last workout took him.
-          ul
-            li(data-bind="text: type")
-            li
-              | "
-              span(data-bind="text: name")
-              | "
-            li
-              | Pace: 
-              span(data-bind="text: pace_mins_per_mi")
-              |  per mile
-            li
-              span(data-bind="text: distance_mi")
-              |  miles
-      div.row
-        div.col-md-6.col-md-offset-3.narcissa-item
-          h1 Here are the last songs Matt played.
-          ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
-            li
-              a(data-bind="attr: {href: url}, text: summary")
-      div.row
-        div.col-md-6.col-md-offset-3.narcissa-item
-          h1 Matt's been listening to these songs a lot lately.
-          ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
-            li
-              a(data-bind="attr: {href: url}, text: summary")
+        div.col-md-6
+          span.narcissa-item
+            h1 These are the last songs Matt played.
+            ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
+              li
+                a(data-bind="attr: {href: url}, text: summary")
+        div.col-md-6
+          span.narcissa-item
+            h1 Matt's been listening to these songs a lot lately.
+            ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
+              li
+                a(data-bind="attr: {href: url}, text: summary")
 
 block scripts
   script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js")
@@ -58,4 +67,5 @@ block scripts
   script(src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js")
   script(src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js")
   script(src="/scripts/vendor/squel.min.js")
+  script(src="/scripts/vendor/Polyline.encoded.js")
   script(src="/scripts/narcissa.js")
