@@ -1,3 +1,4 @@
 db
 config.py
 narcissa.js
+scrapers/*.py
