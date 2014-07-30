@@ -22,6 +22,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 
+# Used to properly access the DB from its config path
 os.chdir(parent_dir)
 
 
