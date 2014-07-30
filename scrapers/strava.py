@@ -5,6 +5,7 @@ def scrape_strava():
     import config
 
     import webbrowser
+    import logging
     from cgi import parse_qs
     from wsgiref.simple_server import make_server
 
@@ -87,6 +88,13 @@ def scrape_strava():
             table.insert(activity_data)
 
         print('Done! %s activities added.' % num_added)
+
+    # Stravalib throws lots of warnings for schema issues on Strava's end.
+    # These warnings don't impact us so let's ignore them.
+    logger_names = [k for k in logging.Logger.manager.loggerDict.keys() if
+                    k.startswith('stravalib')]
+    for logger_name in logger_names:
+        logging.getLogger(logger_name).setLevel(logging.ERROR)
 
     client = Client()
 
