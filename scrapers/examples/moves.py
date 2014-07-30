@@ -127,18 +127,19 @@ def scrape_moves():
                 for prop in ['startTime', 'lastUpdate', 'endTime']:
                     segment[prop] = parse(segment[prop]).isoformat()
                 segment = flatten(segment)
+                # Dedupe: some segments appear in multiple days
+                if segment['startTime'] in segment_start_times:
+                    continue
                 # Flatten foursquareCategoryIds lists
                 if FSQ_PROP in segment:
                     segment[FSQ_PROP] = json.dumps(segment[FSQ_PROP])
-                # Dedupe: some segments appear in multiple days
-                if segment['startTime'] not in segment_start_times:
-                    segment_start_times.add(segment['startTime'])
-                    all_segments.append(segment)
+                segment_start_times.add(segment['startTime'])
+                all_segments.append(segment)
 
+        num_segments = len(all_segments)
         recent_segments = sorted(all_segments,
                                  key=lambda seg: parse(seg['startTime']),
                                  reverse=True)
-        num_segments = len(recent_segments)
 
         segments_added = 0
         segments_updated = 0
