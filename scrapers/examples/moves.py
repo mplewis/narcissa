@@ -118,6 +118,10 @@ def scrape_moves():
         segment_start_times = set()
 
         for day in recentDays:
+            # Sometimes day['segments'] is null. Make sure we catch that.
+            # I'm surprised Moves API returns days without segments.
+            if not day['segments']:
+                continue
             for segment in day['segments']:
                 # Parse then rewrite times to ensure they're consistent
                 for prop in ['startTime', 'lastUpdate', 'endTime']:
