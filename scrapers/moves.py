@@ -136,14 +136,22 @@ def scrape_moves():
         num_segments = len(recent_segments)
 
         segments_added = 0
+        segments_updated = 0
         for segment in recent_segments:
-            if table.find_one(startTime=segment['startTime']):
-                break
-            segments_added += 1
-            table.insert(segment)
+            existing = table.find_one(startTime=segment['startTime'])
+            if existing:
+                existing_updated = parse(existing['lastUpdate'])
+                segment_updated = parse(segment['lastUpdate'])
+                if segment_updated > existing_updated:
+                    segments_updated += 1
+                    segment['id'] = existing['id']
+                    table.update(segment, ['id'])
+            else:
+                segments_added += 1
+                table.insert(segment)
 
-        print('Done! Added %s new segments (out of %s total).' %
-              (segments_added, num_segments))
+        print('Done! Added %s and updated %s segments (out of %s total).' %
+              (segments_added, segments_updated, num_segments))
 
     db = dataset.connect(config.DB_URI)
     tokens = db[TOKEN_TABLE]
