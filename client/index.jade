@@ -4,25 +4,27 @@ block title
   | Hello
 
 block head
-  script(src="/assets/vendor/polymer/platform/platform.js")
-  link(rel="import", href="/assets/vendor/polymer/")
+  <script type="text/javascript" src="//use.typekit.net/qhz6bju.js"></script>
+  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
 block body
   div.container
     div.row
-      div.col-md-12
+      div.col-md-6.col-md-offset-3.narcissa-intro
         h1 This is Narcissa.
-        p She tracks how I live.
-    span.loading(data-bind="visible: !showUI()")
-      h2 Stalking...
-    span.ui(data-bind="visible: showUI")
+        p She helps me track how I live.
+        hr
+    span.narcissa-ui(data-bind="visible: !showUI()")
+      h1 Stalking...
+    span.narcissa-ui(data-bind="visible: showUI")
       div.row
-        div.col-md-4(data-bind="with: currentPlace")
-          h2 This is where I am right now.
+        div.col-md-6.col-md-offset-3.narcissa-item(data-bind="with: currentPlace")
+          h1 This is where Matt is right now.
           p(data-bind="text: place_name")
           p.timeago(data-bind="text: here_since")
-        div.col-md-4(data-bind="with: lastActivity")
-          h2 This is where my last workout took me.
+      div.row
+        div.col-md-6.col-md-offset-3.narcissa-item(data-bind="with: lastActivity")
+          h1 Here's where Matt's last workout took him.
           ul
             li(data-bind="text: type")
             li
@@ -36,13 +38,15 @@ block body
             li
               span(data-bind="text: distance_mi")
               |  miles
-        div.col-md-4
-          h2 These are the last songs I played.
+      div.row
+        div.col-md-6.col-md-offset-3.narcissa-item
+          h1 Here are the last songs Matt played.
           ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
             li
               a(data-bind="attr: {href: url}, text: summary")
-        div.col-md-4
-          h2 Recently I've been listening to these songs a lot.
+      div.row
+        div.col-md-6.col-md-offset-3.narcissa-item
+          h1 Matt's been listening to these songs a lot lately.
           ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
             li
               a(data-bind="attr: {href: url}, text: summary")

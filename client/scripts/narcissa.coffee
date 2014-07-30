@@ -140,9 +140,7 @@ NarcissaViewModel = () ->
           console.log sprintf '%s: cached', name
         return
       )
-      makeVis = () -> self.showUI true; return
-      setTimeout makeVis, 1000
-      return
+      self.showUI true
   ).fail (jqXHR) ->
     console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
     return
