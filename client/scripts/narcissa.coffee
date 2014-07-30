@@ -117,11 +117,11 @@ NarcissaViewModel = () ->
     }
     (data) ->
       self.activities(_.map data.activities.results,
-                      (result) -> new Activity(result))
+                      (result) -> new Activity result)
       self.recentTracks(_.map data.recentTracks.results,
-                        (result) -> new Track(result))
+                        (result) -> new Track result)
       self.addictiveTracks(_.map data.addictiveTracks.results,
-                           (result) -> new Track(result))
+                           (result) -> new Track result)
       self.currentPlace new Place data.currentPlace.results[0]
       _.each(_.pairs(data), (pair) ->
         name = pair[0]
