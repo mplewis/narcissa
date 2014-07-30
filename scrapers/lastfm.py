@@ -6,7 +6,7 @@ def scrape_lastfm():
     USERNAME = 'trickybeta'
 
     # These are the API parameters for our scraping requests.
-    API_KEY = ''
+    API_KEY = 'c0ffeecafefacade'
     PER_PAGE = 200
 
     # Database details.
