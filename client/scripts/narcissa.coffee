@@ -37,6 +37,14 @@ queries = {
     ORDER BY ap.date_uts DESC
     LIMIT 5
   ', {earliestDate: sevenDaysAgo}
+  currentPlace: squel.select()
+    .from('moves_places')
+    .field('startTime')
+    .field('place_name')
+    .field('place_location_lat')
+    .field('place_location_lon')
+    .order('startTime', false)
+    .limit(1)
 }
 
 queryStrings = {}
@@ -81,19 +89,31 @@ Track = (data) ->
   )
   return
 
+Place = (data) ->
+  self.place_name = data.place_name
+  self.start_time = data.startTime
+  self.place_lat = data.place_location_lat
+  self.place_lon = data.place_location_lon
+  self.here_since = ko.computed( () ->
+    $.timeago new Date self.start_time
+  )
+  return
+
 NarcissaViewModel = () ->
   self = this
   
   self.activities = ko.observableArray []
   self.recentTracks = ko.observableArray []
   self.addictiveTracks = ko.observableArray []
+  self.currentPlace = ko.observable()
   
   $.post(
     'http://localhost:5000/'
     {
       'activities': queryStrings.activities,
       'recentTracks': queryStrings.recentTracks,
-      'addictiveTracks': queryStrings.addictiveTracks
+      'addictiveTracks': queryStrings.addictiveTracks,
+      'currentPlace': queryStrings.currentPlace
     }
     (data) ->
       self.activities(_.map data.activities.results,
@@ -102,6 +122,7 @@ NarcissaViewModel = () ->
                         (result) -> new Track(result))
       self.addictiveTracks(_.map data.addictiveTracks.results,
                            (result) -> new Track(result))
+      self.currentPlace new Place data.currentPlace.results[0]
       _.each(_.pairs(data), (pair) ->
         name = pair[0]
         queryTime = pair[1].query_time_sec
