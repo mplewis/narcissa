@@ -25,7 +25,6 @@ def scrape_strava():
 
     # Strava auth callbacks will hit this host and port. Change the port if you
     # need to avoid port conflicts with other servers.
-    CALLBACK_HOST = 'http://localhost'
     CALLBACK_PORT = 36724
 
     # And here's the rest of the scraper.
@@ -33,7 +32,7 @@ def scrape_strava():
     def get_new_token():
         authorize_url = client.authorization_url(
             client_id=CLIENT_ID,
-            redirect_uri=('%s:%s' % (CALLBACK_HOST, CALLBACK_PORT))
+            redirect_uri=('%s:%s' % (config.SERVER_HOST, CALLBACK_PORT))
         )
         webbrowser.open(authorize_url)
         print('Click here to authorize me to access your Strava activities: %s'

@@ -23,7 +23,6 @@ def scrape_moves():
     # need to avoid port conflicts with other servers.
     # Configure your Redirect URI in https://dev.moves-app.com/apps to match
     # your host and port.
-    CALLBACK_HOST = 'http://localhost'
     CALLBACK_PORT = 61902
 
     # Pick your DB table names here.
@@ -67,9 +66,10 @@ def scrape_moves():
                 .encode('utf-8')]
 
     def get_auth_from_code(code):
+        callback_url = '%s:%s' % (config.SERVER_HOST, CALLBACK_PORT)
         resp = requests.post(MOVES_TOKEN_URL %
                              (code, CLIENT_ID, CLIENT_SECRET,
-                              '%s:%s' % (CALLBACK_HOST, CALLBACK_PORT))).json()
+                              callback_url)).json()
         if 'error' in resp:
             raise ValueError('Received error when requesting access token: '
                              '%s' % resp['error'])
