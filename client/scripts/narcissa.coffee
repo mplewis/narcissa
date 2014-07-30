@@ -126,7 +126,10 @@ NarcissaViewModel = () ->
       _.each(_.pairs(data), (pair) ->
         name = pair[0]
         queryTime = pair[1].query_time_sec
-        console.log sprintf '%s: %.3f sec', name, queryTime
+        if queryTime
+          console.log sprintf '%s: query took %.3f sec', name, queryTime
+        else
+          console.log sprintf '%s: cached', name
         return
       )
       return
