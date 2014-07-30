@@ -2,15 +2,20 @@ scheduler = globals()['scheduler']
 
 
 def scrape_lastfm():
-    # Enter your own username here.
+    # Scraper config:
+
+    # Enter your own Last.fm username here.
     USERNAME = 'trickybeta'
-
-    # These are the API parameters for our scraping requests.
+    # Get your app's API key from http://www.last.fm/api/accounts.
     API_KEY = 'c0ffeecafefacade'
+    # Tracks to retrieve per page request. Max 200.
+    # Recommended: 200 for the first run, 10 after that.
+    # Leaving this at 200 makes Last.fm requests really slow.
     PER_PAGE = 200
-
-    # Database details.
+    # Where to store your Last.fm track info.
     DB_TABLE = 'lastfm_tracks'
+
+    # Scraper body begins here.
 
     import config
     import collections
@@ -133,5 +138,6 @@ def scrape_lastfm():
     print('Done! %s track(s) added.' % total_tracks_added)
 
 
-scheduler.every(10).minutes.do(scrape_lastfm)
+# Last.fm allows 1 request per second.
+scheduler.every(1).minutes.do(scrape_lastfm)
 scrape_lastfm()

@@ -2,6 +2,24 @@ scheduler = globals()['scheduler']
 
 
 def scrape_moves():
+    # Scraper config:
+
+    # Enter your Moves app info here.
+    # You can find this at https://dev.moves-app.com/apps
+    # Yes, the client secret is Very Long.
+    CLIENT_ID = 'B1E55EDB1F0CA15'
+    CLIENT_SECRET = 'OFF1C1A15CAFF01D'
+    # Moves auth callbacks will hit this host and port. Change the port if you
+    # need to avoid port conflicts with other servers.
+    # Configure your Redirect URI in https://dev.moves-app.com/apps to match
+    # your host and port.
+    CALLBACK_PORT = 61902
+    # Where to store your Moves places info and the Moves auth token.
+    PLACES_TABLE = 'moves_places'
+    TOKEN_TABLE = 'moves_token'
+
+    # Scraper body begins here.
+
     import config
 
     import collections
@@ -13,23 +31,6 @@ def scrape_moves():
 
     import dataset
     import requests
-
-    # Enter your Moves app info here.
-    # You can find this at https://dev.moves-app.com/apps
-    CLIENT_ID = 'B1E55EDB1F0CA15'
-    CLIENT_SECRET = 'OFF1C1A15CAFF01D'
-
-    # Moves auth callbacks will hit this host and port. Change the port if you
-    # need to avoid port conflicts with other servers.
-    # Configure your Redirect URI in https://dev.moves-app.com/apps to match
-    # your host and port.
-    CALLBACK_PORT = 61902
-
-    # Pick your DB table names here.
-    PLACES_TABLE = 'moves_places'
-    TOKEN_TABLE = 'moves_token'
-
-    # And here's the rest of the scraper.
 
     MOVES_AUTH_URL = ('https://api.moves-app.com/oauth/v1/authorize?'
                       'response_type=code&client_id=%s&scope=%s')
@@ -51,12 +52,12 @@ def scrape_moves():
         start_response("200 OK", [('Content-Type', 'text/plain')])
         parameters = parse_qs(environ.get('QUERY_STRING', ''))
         if 'error' in parameters:
-            err = ('Strava returned an error: %s' % parameters['error'][0]
+            err = ('Moves returned an error: %s' % parameters['error'][0]
                    + '. I can\'t access your data.')
             print(err)
             return [err.encode('utf-8')]
         if 'code' not in parameters:
-            err = ('Strava didn\'t return an auth code. '
+            err = ('Moves didn\'t return an auth code. '
                    'I can\'t access your data.')
             print(err)
             return [err.encode('utf-8')]

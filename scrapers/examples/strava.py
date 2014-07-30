@@ -2,6 +2,21 @@ scheduler = globals()['scheduler']
 
 
 def scrape_strava():
+    # Scraper config:
+
+    # Enter your Strava API info here.
+    # You can find this at https://www.strava.com/settings/api
+    CLIENT_ID = 31337
+    CLIENT_SECRET = 'BA5ED60D'
+    # Strava auth callbacks will hit this host and port. Change the port if you
+    # need to avoid port conflicts with other servers.
+    CALLBACK_PORT = 36724
+    # Where to store your Strava activity info and the Strava auth token.
+    ACTIVITIES_TABLE = 'strava_activities'
+    TOKEN_TABLE = 'strava_token'
+
+    # Scraper body begins here.
+
     import config
 
     import webbrowser
@@ -13,19 +28,6 @@ def scrape_strava():
     from stravalib.client import Client
     from stravalib import unithelper
     from units import unit
-
-    # Enter your Strava API info here.
-    # You can find this at https://www.strava.com/settings/api
-    CLIENT_ID = 31337
-    CLIENT_SECRET = 'BA5ED60D'
-
-    # Pick your DB table names here.
-    ACTIVITIES_TABLE = 'strava_activities'
-    TOKEN_TABLE = 'strava_token'
-
-    # Strava auth callbacks will hit this host and port. Change the port if you
-    # need to avoid port conflicts with other servers.
-    CALLBACK_PORT = 36724
 
     # And here's the rest of the scraper.
 
@@ -107,6 +109,6 @@ def scrape_strava():
     else:
         get_new_token()
 
-
+# Strava allows 600 requests per 15 minutes.
 scheduler.every(10).minutes.do(scrape_strava)
 scrape_strava()
