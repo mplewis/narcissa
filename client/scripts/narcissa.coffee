@@ -147,12 +147,14 @@ NarcissaViewModel = () ->
       rawCurrPlace = data.currentPlace.results[0]
       rawLastAct = data.lastActivity.results[0]
 
-      currPlace = [rawCurrPlace.place_location_lat, rawCurrPlace.place_location_lon]
+      currPlace = [rawCurrPlace.place_location_lat,
+                   rawCurrPlace.place_location_lon]
 
       currPlaceMap.setView currPlace, 14
       L.marker(currPlace).addTo(currPlaceMap)
 
-      workoutPoly = L.Polyline.fromEncoded(rawLastAct.polyline, {color: 'teal'}).addTo lastWorkoutMap
+      workoutPoly = L.Polyline.fromEncoded(
+        rawLastAct.polyline, {color: 'teal'}).addTo lastWorkoutMap
       lastWorkoutMap.fitBounds(workoutPoly.getBounds())
 
   ).fail (jqXHR) ->
