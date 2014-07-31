@@ -50,15 +50,25 @@ block body
         div.col-md-6
           span.narcissa-item
             h1 These are the last songs Matt played.
-            ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
-              li
-                a(data-bind="attr: {href: url}, text: summary")
+            div.row
+              ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
+                div.col-md-4
+                  li
+                    a(data-bind="attr: {href: url}")
+                      img.album-art(data-bind="attr: {src: album_art}, style: {opacity: opacity}")
+                      p(data-bind="text: artist_text")
+                      p(data-bind="text: name")
         div.col-md-6
           span.narcissa-item
             h1 Matt's been listening to these songs a lot lately.
-            ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
-              li
-                a(data-bind="attr: {href: url}, text: summary")
+            div.row
+              ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
+                div.col-md-4
+                  li
+                    a(data-bind="attr: {href: url}")
+                      img.album-art(data-bind="attr: {src: album_art}, style: {opacity: opacity}")
+                      p(data-bind="text: artist_text")
+                      p(data-bind="text: name")
 
 block scripts
   script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js")

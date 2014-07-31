@@ -1,3 +1,19 @@
+API_URLS = {
+  lastfm: 'http://ws.audioscrobbler.com/2.0/?' +
+    'method=album.getinfo&api_key=%s&artist=%s&album=%s&format=json'
+}
+
+API_KEYS = {
+  lastfm: 'daadd05b0eefdbcfac9df552e5d90a86'
+}
+
+PLACEHOLDERS = {
+  album: {
+    image: '/images/unknown_album.png',
+    opacity: 0.2
+  }
+}
+
 sevenDaysAgo = Date.today().add(-3).days().valueOf() / 1000
 
 min_to_m_ss = (min_frac) ->
@@ -27,6 +43,7 @@ queries = {
     .field('name')
     .field('artist_text')
     .field('album_text')
+    .field('album_mbid')
     .field('date_uts')
     .field('url')
     .order('date_uts', false)
@@ -73,14 +90,11 @@ Track = (data) ->
   self.name = data.name
   self.artist_text = data.artist_text
   self.album_text = data.album_text
+  self.album_mbid = data.album_mbid
   self.date_uts = data.date_uts
   self.url = data.url
-  self.summary = ko.computed( () ->
-    if self.album_text
-      sprintf '%s - %s (from %s)', self.artist_text, self.name, self.album_text
-    else
-      sprintf '%s - %s', self.artist_text, self.name
-  )
+  self.album_art = ko.observable PLACEHOLDERS.album.image
+  self.opacity = ko.observable PLACEHOLDERS.album.opacity
   return
 
 Place = (data) ->
@@ -126,16 +140,45 @@ NarcissaViewModel = () ->
                         (result) -> new Track result)
       self.addictiveTracks(_.map data.addictiveTracks.results,
                            (result) -> new Track result)
-      _.each(_.pairs(data), (pair) ->
-        name = pair[0]
-        queryTime = pair[1].query_time_sec
-        if queryTime
-          console.log sprintf '%s: query took %.3f sec', name, queryTime
-        else
-          console.log sprintf '%s: cached', name
-        return
-      )
+
       self.showUI true
+
+      for pair in _.pairs(data)
+        do (pair) ->
+          name = pair[0]
+          queryTime = pair[1].query_time_sec
+          if queryTime
+            console.log sprintf '%s: query took %.3f sec', name, queryTime
+          else
+            console.log sprintf '%s: cached', name
+          return
+
+      allTracks = []
+      allTracks.push(track) for track in self.recentTracks()
+      allTracks.push(track) for track in self.addictiveTracks()
+      uniqueTracks = _.uniq allTracks, false, (track) ->
+        track.artist_text + '!?&*#' + track.album_text
+
+      for ut in uniqueTracks
+        do (ut) ->
+          console.log ut.artist_text, ut.album_text, ut.album_mbid
+          if ut.artist_text && ut.album_text
+            $.get(
+              sprintf(
+                API_URLS.lastfm, API_KEYS.lastfm
+                ut.artist_text, ut.album_text
+              )
+              (data) ->
+                imageXL = data.album.image[3]['#text']
+                if imageXL.length == 0
+                  return
+                for at in allTracks
+                  if (at.artist_text == ut.artist_text and
+                    at.album_text == ut.album_text)
+                      at.album_art imageXL
+                      at.opacity 1.0
+            )
+          return
 
       currPlaceMap = L.mapbox.map 'map-current-place', 'mplewis.j3i59a6a'
       lastWorkoutMap = L.mapbox.map 'map-last-workout', 'mplewis.j3i59a6a'
@@ -152,6 +195,8 @@ NarcissaViewModel = () ->
       workoutPoly = L.Polyline.fromEncoded(
         rawLastAct.polyline, {color: 'teal'}).addTo lastWorkoutMap
       lastWorkoutMap.fitBounds(workoutPoly.getBounds())
+
+      return
 
   ).fail (jqXHR) ->
     console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
