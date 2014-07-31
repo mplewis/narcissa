@@ -8,10 +8,7 @@ API_KEYS = {
 }
 
 PLACEHOLDERS = {
-  album: {
-    image: '/images/unknown_album.png',
-    opacity: 0.2
-  }
+  album: '/images/unknown_album.png'
 }
 
 sevenDaysAgo = Date.today().add(-3).days().valueOf() / 1000
@@ -93,8 +90,8 @@ Track = (data) ->
   self.album_mbid = data.album_mbid
   self.date_uts = data.date_uts
   self.url = data.url
-  self.album_art = ko.observable PLACEHOLDERS.album.image
-  self.opacity = ko.observable PLACEHOLDERS.album.opacity
+  self.album_art = ko.observable PLACEHOLDERS.album
+  self.found_album_art = ko.observable false
   return
 
 Place = (data) ->
@@ -176,7 +173,7 @@ NarcissaViewModel = () ->
                   if (at.artist_text == ut.artist_text and
                     at.album_text == ut.album_text)
                       at.album_art imageXL
-                      at.opacity 1.0
+                      at.found_album_art true
             )
           return
 
