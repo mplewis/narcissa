@@ -31,6 +31,7 @@ def scrape_moves():
 
     import dataset
     import requests
+    from pytz import utc
 
     MOVES_AUTH_URL = ('https://api.moves-app.com/oauth/v1/authorize?'
                       'response_type=code&client_id=%s&scope=%s')
@@ -123,9 +124,11 @@ def scrape_moves():
             if not day['segments']:
                 continue
             for segment in day['segments']:
-                # Parse then rewrite times to ensure they're consistent
+                # Parse then rewrite times as UTC to ensure they're consistent
                 for prop in ['startTime', 'lastUpdate', 'endTime']:
-                    segment[prop] = parse(segment[prop]).isoformat()
+                    dirty_dt = parse(segment[prop])
+                    clean_dt = utc.normalize(dirty_dt.astimezone(utc))
+                    segment[prop] = clean_dt.isoformat()
                 segment = flatten(segment)
                 # Dedupe: some segments appear in multiple days
                 if segment['startTime'] in segment_start_times:
