@@ -78,9 +78,9 @@ _.each(_.pairs(queries), (pair) ->
 Activity = (data) ->
   self = this
   self.name = data.name
-  self.type = data.type
+  self.type = data.type.toLowerCase()
   self.start_date = data.start_date
-  self.distance_mi = sprintf '%.02f', data.distance_mi
+  self.distance_mi = sprintf '%.01f', data.distance_mi
   self.pace_mins_per_mi = min_to_m_ss(data.pace_mins_per_mi)
   self.polyline = data.polyline
   return
