@@ -51,7 +51,7 @@ queries = {
   addictiveTracks: sprintf '
     SELECT COUNT(fp.url) AS plays, fp.date_uts AS date_uts,
       fp.artist_text AS artist_text, fp.name AS name,
-      fp.album_text AS album_text
+      fp.album_text AS album_text, fp.url AS url
       FROM
         (SELECT * FROM lastfm_tracks GROUP BY url ORDER BY date_uts) fp
     INNER JOIN lastfm_tracks ap ON
