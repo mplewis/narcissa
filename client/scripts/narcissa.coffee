@@ -1,6 +1,8 @@
 API_URLS = {
-  lastfm: 'http://ws.audioscrobbler.com/2.0/?' +
-    'method=album.getinfo&api_key=%s&artist=%s&album=%s&format=json'
+  lastfm: {
+    getAlbumArt: 'http://ws.audioscrobbler.com/2.0/?' +
+      'method=album.getinfo&api_key=%s&artist=%s&album=%s&format=json'
+  }
 }
 
 API_KEYS = {
@@ -11,7 +13,8 @@ PLACEHOLDERS = {
   album: '/images/unknown_album.png'
 }
 
-sevenDaysAgo = Date.today().add(-3).days().valueOf() / 1000
+sevenDaysAgo = Date.today().add(-7).days().valueOf() / 1000
+console.log sevenDaysAgo
 
 min_to_m_ss = (min_frac) ->
   sprintf '%d:%02d', Math.floor(min_frac), 60 * (min_frac % 1)
@@ -44,13 +47,13 @@ queries = {
     .field('date_uts')
     .field('url')
     .order('date_uts', false)
-    .limit(3)
+    .limit(5)
   addictiveTracks: sprintf '
-    SELECT
-      fp.name AS name, fp.artist_text AS artist_text,
-      fp.album_text AS album_text, fp.date_uts AS date_uts, fp.url AS url
-    FROM
-      (SELECT * FROM lastfm_tracks GROUP BY url ORDER BY date_uts) fp
+    SELECT COUNT(fp.url) AS plays, fp.date_uts AS date_uts,
+      fp.artist_text AS artist_text, fp.name AS name,
+      fp.album_text AS album_text
+      FROM
+        (SELECT * FROM lastfm_tracks GROUP BY url ORDER BY date_uts) fp
     INNER JOIN lastfm_tracks ap ON
       fp.url = ap.url AND
       ap.date_uts - fp.date_uts <= (86400 * 7)
@@ -59,8 +62,8 @@ queries = {
       fp.date_uts > %(earliestDate)s
     GROUP BY ap.url
     HAVING COUNT(ap.url) > 3
-    ORDER BY ap.date_uts DESC
-    LIMIT 3
+    ORDER BY plays DESC
+    LIMIT 5
   ', {earliestDate: sevenDaysAgo}
 }
 
@@ -83,15 +86,15 @@ Activity = (data) ->
   return
 
 Track = (data) ->
+  console.log data
   self = this
   self.name = data.name
   self.artist_text = data.artist_text
   self.album_text = data.album_text
   self.album_mbid = data.album_mbid
-  self.date_uts = data.date_uts
+  self.plays = data.plays || 1
+  self.played_at = new Date((data.date_uts * 1000)).toISOString()
   self.url = data.url
-  self.album_art = ko.observable PLACEHOLDERS.album
-  self.found_album_art = ko.observable false
   return
 
 Place = (data) ->
@@ -99,9 +102,6 @@ Place = (data) ->
   self.start_time = data.startTime
   self.place_lat = data.place_location_lat
   self.place_lon = data.place_location_lon
-  self.here_since = ko.computed( () ->
-    $.timeago new Date self.start_time
-  )
   return
 
 NarcissaViewModel = () ->
@@ -156,27 +156,6 @@ NarcissaViewModel = () ->
       uniqueTracks = _.uniq allTracks, false, (track) ->
         track.artist_text + '!?&*#' + track.album_text
 
-      for ut in uniqueTracks
-        do (ut) ->
-          console.log ut.artist_text, ut.album_text, ut.album_mbid
-          if ut.artist_text && ut.album_text
-            $.get(
-              sprintf(
-                API_URLS.lastfm, API_KEYS.lastfm
-                ut.artist_text, ut.album_text
-              )
-              (data) ->
-                imageXL = data.album.image[3]['#text']
-                if imageXL.length == 0
-                  return
-                for at in allTracks
-                  if (at.artist_text == ut.artist_text and
-                    at.album_text == ut.album_text)
-                      at.album_art imageXL
-                      at.found_album_art true
-            )
-          return
-
       currPlaceMap = L.mapbox.map 'map-current-place', 'mplewis.j3i59a6a'
       lastWorkoutMap = L.mapbox.map 'map-last-workout', 'mplewis.j3i59a6a'
 
@@ -198,6 +177,31 @@ NarcissaViewModel = () ->
   ).fail (jqXHR) ->
     console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
     return
+  return
+
+# From http://stackoverflow.com/a/11270500/254187
+ko.bindingHandlers.timeago = update: (element, valueAccessor) ->
+  value = ko.utils.unwrapObservable(valueAccessor())
+  $this = $(element)
+  # Set the title attribute to the new value = timestamp
+  $this.attr "title", value
+
+  # If timeago has already been applied to this node, don't reapply it -
+  # since timeago isn't really flexible (it doesn't provide a public
+  # remove() or refresh() method) we need to do everything by ourselves.
+  if $this.data("timeago")
+    datetime = $.timeago.datetime($this)
+    distance = (new Date().getTime() - datetime.getTime())
+    inWords = $.timeago.inWords(distance)
+    # Update cache and displayed text..
+    $this.data "timeago",
+      datetime: datetime
+    $this.text inWords
+
+  else
+    # timeago hasn't been applied to this node -> we do that now!
+    $this.timeago()
+
   return
 
 ko.applyBindings new NarcissaViewModel()

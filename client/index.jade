@@ -28,7 +28,7 @@ block body
             h1 This is where Matt is right now.
             div#map-current-place.map
             p(data-bind="text: place_name")
-            p.timeago(data-bind="text: here_since")
+            p(data-bind="timeago: start_time")
         div.col-md-6
           span.narcissa-item(data-bind="with: lastActivity")
             h1 Here's where Matt's last workout took him.
@@ -50,25 +50,32 @@ block body
         div.col-md-6
           span.narcissa-item
             h1 These are the last songs Matt played.
-            div.row
-              ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
-                div.col-md-4
-                  li
-                    a(data-bind="attr: {href: url}")
-                      img.album-art(data-bind="attr: {src: album_art}, css: {no_album: !found_album_art()}")
-                      p(data-bind="text: artist_text")
-                      p(data-bind="text: name")
+            ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
+              div.row
+                div.col-md-4.left-col
+                  p(data-bind="timeago: played_at")
+                div.col-md-8
+                  a(data-bind="attr: {href: url}")
+                    p
+                      span(data-bind="text: artist_text")
+                      |  - 
+                      span(data-bind="text: name")
         div.col-md-6
           span.narcissa-item
             h1 Matt's been listening to these songs a lot lately.
             div.row
               ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
-                div.col-md-4
-                  li
+                div.row
+                  div.col-md-4.left-col
+                    p
+                      span(data-bind="text: plays")
+                      |  plays
+                  div.col-md-8
                     a(data-bind="attr: {href: url}")
-                      img.album-art(data-bind="attr: {src: album_art}, css: {no_album: !found_album_art()}")
-                      p(data-bind="text: artist_text")
-                      p(data-bind="text: name")
+                      p
+                        span(data-bind="text: artist_text")
+                        |  - 
+                        span(data-bind="text: name")
 
 block scripts
   script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js")
@@ -79,3 +86,5 @@ block scripts
   script(src="/scripts/vendor/squel.min.js")
   script(src="/scripts/vendor/Polyline.encoded.js")
   script(src="/scripts/narcissa.js")
+  script.
+    $('.timeago').timeago;
