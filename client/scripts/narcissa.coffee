@@ -14,7 +14,6 @@ PLACEHOLDERS = {
 }
 
 sevenDaysAgo = Date.today().add(-7).days().valueOf() / 1000
-console.log sevenDaysAgo
 
 min_to_m_ss = (min_frac) ->
   sprintf '%d:%02d', Math.floor(min_frac), 60 * (min_frac % 1)
@@ -81,25 +80,30 @@ Activity = (data) ->
   self.type = data.type.toLowerCase()
   self.start_date = data.start_date
   self.distance_mi = sprintf '%.01f', data.distance_mi
+  self.distance_type = sprintf '%.01f-mile %s', data.distance_mi, self.type
   self.pace_mins_per_mi = min_to_m_ss(data.pace_mins_per_mi)
+  self.pace_verbose = sprintf 'Pace: %s/mi', min_to_m_ss(data.pace_mins_per_mi)
   self.polyline = data.polyline
   return
 
 Track = (data) ->
-  console.log data
   self = this
   self.name = data.name
   self.artist_text = data.artist_text
   self.album_text = data.album_text
   self.album_mbid = data.album_mbid
   self.plays = data.plays || 1
+  self.plays_wk = self.plays + ' plays/week'
   self.played_at = new Date((data.date_uts * 1000)).toISOString()
   self.url = data.url
+  self.timeago = $.timeago(self.played_at)
+  self.artist_track = data.artist_text + ' - ' + data.name
   return
 
 Place = (data) ->
   self.place_name = data.place_name
   self.start_time = data.startTime
+  self.timeago = $.timeago new Date self.start_time
   self.place_lat = data.place_location_lat
   self.place_lon = data.place_location_lon
   return
@@ -115,12 +119,6 @@ NarcissaViewModel = () ->
   self.lastActivity = ko.observable()
   self.recentTracks = ko.observableArray []
   self.addictiveTracks = ko.observableArray []
-
-  $.get(
-    '/data/whoami.json'
-    (data) ->
-      console.log data
-  )
 
   $.post(
     'http://localhost:5000/'
@@ -177,30 +175,13 @@ NarcissaViewModel = () ->
   ).fail (jqXHR) ->
     console.log jqXHR.status, jqXHR.statusText, jqXHR.responseText
     return
-  return
 
-# From http://stackoverflow.com/a/11270500/254187
-ko.bindingHandlers.timeago = update: (element, valueAccessor) ->
-  value = ko.utils.unwrapObservable(valueAccessor())
-  $this = $(element)
-  # Set the title attribute to the new value = timestamp
-  $this.attr "title", value
-
-  # If timeago has already been applied to this node, don't reapply it -
-  # since timeago isn't really flexible (it doesn't provide a public
-  # remove() or refresh() method) we need to do everything by ourselves.
-  if $this.data("timeago")
-    datetime = $.timeago.datetime($this)
-    distance = (new Date().getTime() - datetime.getTime())
-    inWords = $.timeago.inWords(distance)
-    # Update cache and displayed text..
-    $this.data "timeago",
-      datetime: datetime
-    $this.text inWords
-
-  else
-    # timeago hasn't been applied to this node -> we do that now!
-    $this.timeago()
+  ko.bindingHandlers.typed = update: (element, valueAccessor) ->
+    value = ko.utils.unwrapObservable(valueAccessor())
+    $(element).typed {
+      typeSpeed: 100
+      strings: [value]
+    }
 
   return
 
