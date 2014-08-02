@@ -1,5 +1,7 @@
 }
 
+API_URLS = {
+  narcissa: 'http://narcissa.kesdev.com:5000/'
 }
 
 PLACEHOLDERS = {
@@ -115,7 +117,7 @@ NarcissaViewModel = () ->
   self.addictiveTracks = ko.observableArray []
 
   $.post(
-    'http://localhost:5000/'
+    API_URLS.narcissa,
     {
       'currentPlace': queryStrings.currentPlace
       'lastActivity': queryStrings.lastActivity,
