@@ -1,3 +1,5 @@
+SETTINGS = {
+  debug: false
 }
 
 API_URLS = {
@@ -138,10 +140,11 @@ NarcissaViewModel = () ->
         do (pair) ->
           name = pair[0]
           queryTime = pair[1].query_time_sec
-          if queryTime
-            console.log sprintf '%s: query took %.3f sec', name, queryTime
-          else
-            console.log sprintf '%s: cached', name
+          if SETTINGS.debug
+            if queryTime
+              console.log sprintf '%s: query took %.3f sec', name, queryTime
+            else
+              console.log sprintf '%s: cached', name
           return
 
       allTracks = []
