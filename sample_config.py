@@ -14,3 +14,5 @@ QUERY_CACHE_EXPIRY_SECS = 30
 # The server's web-visible hostname, NOT including a trailing slash or port
 # If you're running this locally, use 'http://localhost'
 SERVER_HOST = 'http://localhost'
+# The port on which Narcissa will answer web SQL queries
+SERVER_PORT = 20410
