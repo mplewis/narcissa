@@ -1,12 +1,5 @@
-API_URLS = {
-  lastfm: {
-    getAlbumArt: 'http://ws.audioscrobbler.com/2.0/?' +
-      'method=album.getinfo&api_key=%s&artist=%s&album=%s&format=json'
-  }
 }
 
-API_KEYS = {
-  lastfm: 'daadd05b0eefdbcfac9df552e5d90a86'
 }
 
 PLACEHOLDERS = {
