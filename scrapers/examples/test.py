@@ -5,6 +5,11 @@ scheduler = globals()['scheduler']
 
 # Write everything inside one giant function so that function can be scheduled
 # for later execution.
+
+# This function MUST be named uniquely so it doesn't interfere with other
+# scrapers or Narcissa functions. One safe way to name functions is to use the
+# scrape_ prefix with the filename of the scraper.
+
 def scrape_test():
     """
     This scraper illustrates the following:
