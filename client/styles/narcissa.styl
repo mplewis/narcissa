@@ -1,3 +1,22 @@
+fade-on-load(time)
+  -webkit-animation: fadeIn ease-in 1
+  -moz-animation: fadeIn ease-in 1
+  -o-animation: fadeIn ease-in 1
+  animation: fadeIn ease-in 1
+  -webkit-animation-duration: time
+  -moz-animation-duration: time
+  -o-animation-duration: time
+  animation-duration: time
+  -webkit-animation-fill-mode: forwards
+  -moz-animation-fill-mode: forwards
+  -o-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+
+@-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@-o-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
 body
   margin-top: 40px
   margin-bottom: 40px
@@ -13,29 +32,18 @@ a
 
 .narcissa-intro
   font-family: 'omnes-pro'
+  h1
+    font-weight: 200
+    margin-top: 0
+  strong
+    font-weight: 400
 
 .narcissa-ui
   font-family: 'courier-prime'
   h1, h2, h3, h4, h5, h6
     font-family: 'tangerine'
     opacity: 0
-    -webkit-animation: fadeIn ease-in 1
-    -moz-animation: fadeIn ease-in 1
-    -o-animation: fadeIn ease-in 1
-    animation: fadeIn ease-in 1
-    -webkit-animation-duration: 1s
-    -moz-animation-duration: 1s
-    -o-animation-duration: 1s
-    animation-duration: 1s
-    -webkit-animation-fill-mode: forwards
-    -moz-animation-fill-mode: forwards
-    -o-animation-fill-mode: forwards
-    animation-fill-mode: forwards
-
-@-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-@-o-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    fade-on-load(1s)
 
 .narcissa-item
   margin-bottom: 20px
@@ -47,6 +55,7 @@ a
 .map
   height: 300px
   width: 100%
+  fade-on-load(1s)
 
 .map-overlay
   background: rgba(255, 255, 255, 0.9)
@@ -60,6 +69,7 @@ a
   padding-left: 16px
   padding-right: 16px
   text-align: right
+  fade-on-load(1s)
   h1, p
     margin-top: 0
     margin-bottom: 0

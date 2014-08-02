@@ -104,7 +104,7 @@ Track = (data) ->
 Place = (data) ->
   self.place_name = data.place_name
   self.start_time = data.startTime
-  self.timeago = $.timeago new Date self.start_time
+  self.timeago = 'since ' + $.timeago new Date self.start_time
   self.place_lat = data.place_location_lat
   self.place_lon = data.place_location_lon
   return

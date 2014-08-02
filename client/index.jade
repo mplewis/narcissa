@@ -14,8 +14,10 @@ block body
   div.container
     div.row
       div.col-md-6.col-md-offset-3.narcissa-intro
-        h1 Narcissa
-        p tracks how I live daily.
+        h1 I'm Matt.
+        h1 
+          strong: a(href="https://github.com/mplewis/narcissa") Narcissa
+          |  tracks how I live.
         hr
     span.narcissa-ui(data-bind="visible: !showUI()")
       div.row
@@ -23,7 +25,7 @@ block body
           h1 Stalking...
     span.narcissa-ui(data-bind="visible: showUI")
       div.row
-        div.col-md-6
+        div.col-sm-6.col-md-offset-3
           div.narcissa-item(data-bind="with: currentPlace")
             h1 This is where Matt is right now.
             div.map-container
@@ -34,7 +36,8 @@ block body
                   span(data-bind="text: place_name")
                   | "
                 p(data-bind="typed: timeago")
-        div.col-md-6
+      div.row
+        div.col-sm-6.col-md-offset-3
           div.narcissa-item(data-bind="with: lastActivity")
             h1 Here's where Matt's last workout took him.
             div.map-container
@@ -47,7 +50,7 @@ block body
                 p(data-bind="typed: distance_ago")
                 li(data-bind="typed: pace_verbose")
       div.row
-        div.col-md-6
+        div.col-sm-6.col-md-offset-3
           div.narcissa-item
             h1 These are the last songs Matt played.
             ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
@@ -57,7 +60,8 @@ block body
                 div.col-xs-8
                   a(data-bind="attr: {href: url}")
                     p(data-bind="typed: artist_track")
-        div.col-md-6
+      div.row
+        div.col-sm-6.col-md-offset-3
           div.narcissa-item
             h1 Matt's been listening to these songs a lot lately.
             div.row
@@ -68,6 +72,10 @@ block body
                   div.col-xs-8
                     a(data-bind="attr: {href: url}")
                       p(data-bind="typed: artist_track")
+      div.row
+        div.col-sm-6.col-md-offset-3
+          hr
+          h1 I update this data every minute or two. Enjoy! -N
 
 block scripts
   script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js")
