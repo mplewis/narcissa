@@ -13,8 +13,8 @@ block head
 block body
   div.container
     div.row
-      div.col-md-6.col-md-offset-3.narcissa-intro
         h1 I'm Matt.
+      div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3.narcissa-intro
         h1 
           strong: a(href="https://github.com/mplewis/narcissa") Narcissa
           |  tracks how I live.
@@ -25,7 +25,7 @@ block body
           h1 Stalking...
     span.narcissa-ui(data-bind="visible: showUI")
       div.row
-        div.col-sm-6.col-md-offset-3
+        div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
           div.narcissa-item(data-bind="with: currentPlace")
             h1 This is where Matt is right now.
             div.map-container
@@ -37,7 +37,7 @@ block body
                   | "
                 p(data-bind="typed: timeago")
       div.row
-        div.col-sm-6.col-md-offset-3
+        div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
           div.narcissa-item(data-bind="with: lastActivity")
             h1 Here's where Matt's last workout took him.
             div.map-container
@@ -50,7 +50,7 @@ block body
                 p(data-bind="typed: distance_ago")
                 li(data-bind="typed: pace_verbose")
       div.row
-        div.col-sm-6.col-md-offset-3
+        div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
           div.narcissa-item
             h1 These are the last songs Matt played.
             ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
@@ -61,8 +61,8 @@ block body
                   a(data-bind="attr: {href: url}")
                     p(data-bind="typed: artist_track")
       div.row
-        div.col-sm-6.col-md-offset-3
           div.narcissa-item
+        div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
             h1 Matt's been listening to these songs a lot lately.
             div.row
               ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
@@ -73,7 +73,7 @@ block body
                     a(data-bind="attr: {href: url}")
                       p(data-bind="typed: artist_track")
       div.row
-        div.col-sm-6.col-md-offset-3
+        div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3.narcissa-footer
           hr
           h1 I update this data every minute or two. Enjoy! -N
 
