@@ -8,7 +8,6 @@ from time import sleep
 from glob import glob
 
 
-META_IMPORT = '# narcissa import '
 scheduler = SafeScheduler()
 
 
