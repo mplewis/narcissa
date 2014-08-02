@@ -30,7 +30,7 @@ def start_server():
     return p
 
 
-def start_scrapers():
+def load_scrapers():
     for scraper_path in glob('scrapers/*.py'):
         with open(scraper_path) as f:
             print(scraper_path)
@@ -42,7 +42,7 @@ def main():
     make_exit_graceful()
     server = start_server()
     atexit.register(server.terminate)
-    start_scrapers()
+    load_scrapers()
     while True:
         scheduler.run_pending()
         sleep(1)
