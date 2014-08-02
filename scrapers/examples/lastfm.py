@@ -140,4 +140,3 @@ def scrape_lastfm():
 
 # Last.fm allows 1 request per second.
 scheduler.every(1).minutes.do(scrape_lastfm)
-scrape_lastfm()

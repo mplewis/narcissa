@@ -111,4 +111,3 @@ def scrape_strava():
 
 # Strava allows 600 requests per 15 minutes.
 scheduler.every(10).minutes.do(scrape_strava)
-scrape_strava()

@@ -40,6 +40,5 @@ def scrape_test():
 
 
 # Schedule this task to run every 3 seconds.
+# It will run immediately as well.
 scheduler.every(3).seconds.do(scrape_test)
-# Run it immediately so we don't have to wait for its first scheduled run.
-scrape_test()

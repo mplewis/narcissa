@@ -177,4 +177,3 @@ def scrape_moves():
 # per minute. For apps published in Connected Apps, the limits are 4000
 # requests per hour and 120 requests per minute.
 scheduler.every(1).minutes.do(scrape_moves)
-scrape_moves()

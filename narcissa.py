@@ -43,6 +43,7 @@ def main():
     server = start_server()
     atexit.register(server.terminate)
     load_scrapers()
+    scheduler.run_all()
     while True:
         scheduler.run_pending()
         sleep(1)
