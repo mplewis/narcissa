@@ -64,14 +64,13 @@ block body
           div.narcissa-item
         div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
             h1 Matt's been listening to these songs a lot lately.
-            div.row
-              ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
-                div.row
-                  div.col-xs-4.left-col
-                    p(data-bind="typed: plays_wk")
-                  div.col-xs-8
-                    a(data-bind="attr: {href: url}")
-                      p(data-bind="typed: artist_track")
+            ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
+              div.row
+                div.col-xs-4.left-col
+                  p(data-bind="typed: plays_wk")
+                div.col-xs-8
+                  a(data-bind="attr: {href: url}")
+                    p(data-bind="typed: artist_track")
       div.row
         div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3.narcissa-footer
           hr
