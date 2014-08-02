@@ -18,7 +18,9 @@ def scrape_lastfm():
     # Scraper body begins here.
 
     import config
+
     import collections
+
     import dataset
     import requests
 
