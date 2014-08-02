@@ -1,0 +1,6 @@
+schedule==0.3.0
+stravalib==0.2.2
+dataset==0.5.4
+units==0.06
+requests==2.3.0
+pytz==2014.4
