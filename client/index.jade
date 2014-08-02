@@ -13,8 +13,8 @@ block head
 block body
   div.container
     div.row
-        h1 I'm Matt.
       div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3.narcissa-intro
+        h1: a(href="http://mplewis.com") I'm Matt.
         h1 
           strong: a(href="https://github.com/mplewis/narcissa") Narcissa
           |  tracks how I live.
@@ -74,7 +74,7 @@ block body
       div.row
         div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3.narcissa-footer
           hr
-          h1 I update this data every minute or two. Enjoy! -N
+          p I update this data every minute or two. -n
 
 block scripts
   script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js")
