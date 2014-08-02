@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
+import config
+from utils.safe_schedule import SafeScheduler
+
 import subprocess
 import atexit
 import sys
-from utils.safe_schedule import SafeScheduler
 from time import sleep
 from glob import glob
 
@@ -24,7 +26,7 @@ def make_exit_graceful():
 
 
 def start_server():
-    cmd = 'waitress-serve --port=5000 server:app'
+    cmd = 'waitress-serve --port=%s server:app' % config.SERVER_PORT
     p = subprocess.Popen(cmd.split(), cwd='server')
     return p
 

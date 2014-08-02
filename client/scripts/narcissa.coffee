@@ -3,7 +3,7 @@ SETTINGS = {
 }
 
 API_URLS = {
-  narcissa: 'http://narcissa.kesdev.com:5000/'
+  narcissa: 'http://localhost:20410/'
 }
 
 PLACEHOLDERS = {
