@@ -1,5 +1,5 @@
-db
 config.py
 narcissa.js
 scrapers/*.py
 deploy.sh
+data.sqlite
