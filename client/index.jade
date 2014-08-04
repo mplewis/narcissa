@@ -26,52 +26,52 @@ block body
           h1 Stalking...
     span.narcissa-ui(data-bind="visible: showUI")
       div.row
-        div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
-          div.narcissa-item(data-bind="with: currentPlace")
-            h1 This is where Matt is right now.
-            div.map-container
-              div#map-current-place.map
-              div#map-current-place-overlay.map-overlay
-                h1
-                  | "
-                  span(data-bind="text: place_name")
-                  | "
+        div.narcissa-item.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3(data-bind="with: currentPlace")
+          h1 This is where Matt is right now.
+          div.map-container
+            div#map-current-place.map
+            div#map-current-place-overlay.map-overlay
+              h1
+                | "
+                span(data-bind="text: place_name")
+                | "
+              p(data-bind="typed: timeago")
+      div.row
+        div.narcissa-item.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3(data-bind="with: lastActivity")
+          h1 Here's where Matt's last workout took him.
+          div.map-container
+            div#map-last-workout.map
+            ul.map-overlay
+              h1
+                | "
+                span(data-bind="text: name")
+                | "
+              p(data-bind="typed: distance_ago")
+              li(data-bind="typed: pace_verbose")
+      div.row
+        div.narcissa-item.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
+          h1 These are the last songs Matt played.
+          ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
+            div.row
+              div.col-xs-4.left-col
                 p(data-bind="typed: timeago")
+              div.col-xs-8
+                a(data-bind="attr: {href: url}")
+                  p(data-bind="typed: artist_track")
       div.row
-        div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
-          div.narcissa-item(data-bind="with: lastActivity")
-            h1 Here's where Matt's last workout took him.
-            div.map-container
-              div#map-last-workout.map
-              ul.map-overlay
-                h1
-                  | "
-                  span(data-bind="text: name")
-                  | "
-                p(data-bind="typed: distance_ago")
-                li(data-bind="typed: pace_verbose")
+        div.narcissa-item.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
+          h1 Matt's been listening to these songs a lot lately.
+          ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
+            div.row
+              div.col-xs-4.left-col
+                p(data-bind="typed: plays_wk")
+              div.col-xs-8
+                a(data-bind="attr: {href: url}")
+                  p(data-bind="typed: artist_track")
       div.row
-        div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
-          div.narcissa-item
-            h1 These are the last songs Matt played.
-            ul(data-bind="foreach: recentTracks, visible: recentTracks().length > 0")
-              div.row
-                div.col-xs-4.left-col
-                  p(data-bind="typed: timeago")
-                div.col-xs-8
-                  a(data-bind="attr: {href: url}")
-                    p(data-bind="typed: artist_track")
-      div.row
-          div.narcissa-item
-        div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
-            h1 Matt's been listening to these songs a lot lately.
-            ul(data-bind="foreach: addictiveTracks, visible: addictiveTracks().length > 0")
-              div.row
-                div.col-xs-4.left-col
-                  p(data-bind="typed: plays_wk")
-                div.col-xs-8
-                  a(data-bind="attr: {href: url}")
-                    p(data-bind="typed: artist_track")
+        div.narcissa-item.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
+          h1 Here's some more of what Matt's been up to.
+          p(data-bind="typed: last_day_commits")
       div.row
         div.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3.narcissa-footer
           hr
