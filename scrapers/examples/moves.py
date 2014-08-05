@@ -23,7 +23,6 @@ def scrape_moves():
     import config
 
     import collections
-    import json
     import webbrowser
     from dateutil.parser import parse
     from cgi import parse_qs
@@ -111,12 +110,14 @@ def scrape_moves():
     def query_moves(token):
         print('Querying Moves...')
 
-        table = db[PLACES_TABLE]
+        table_places = db[PLACES_TABLE]
+        table_categories = db[CATEGORIES_TABLE]
         days = moves_get('/user/places/daily?pastDays=31', token)
         recentDays = sorted(days, key=lambda item: item['date'], reverse=True)
 
         all_segments = []
         segment_start_times = set()
+        segment_categories = {}
 
         for day in recentDays:
             # Sometimes day['segments'] is null. Make sure we catch that.
@@ -133,9 +134,15 @@ def scrape_moves():
                 # Dedupe: some segments appear in multiple days
                 if segment['startTime'] in segment_start_times:
                     continue
-                # Flatten foursquareCategoryIds lists
+                # Move foursquareCategoryIds lists outside of place data
+                # into segment_categories: lists of categories indexed by
+                # segment startTimes
+                categories = []
                 if FSQ_PROP in segment:
-                    segment[FSQ_PROP] = json.dumps(segment[FSQ_PROP])
+                    categories = segment[FSQ_PROP]
+                    if categories:
+                        segment_categories[segment['startTime']] = categories
+                    del segment[FSQ_PROP]
                 segment_start_times.add(segment['startTime'])
                 all_segments.append(segment)
 
@@ -147,17 +154,35 @@ def scrape_moves():
         segments_added = 0
         segments_updated = 0
         for segment in recent_segments:
-            existing = table.find_one(startTime=segment['startTime'])
+            existing = table_places.find_one(startTime=segment['startTime'])
+            needs_categories = False
             if existing:
                 existing_updated = parse(existing['lastUpdate'])
                 segment_updated = parse(segment['lastUpdate'])
                 if segment_updated > existing_updated:
+                    # Segment has been updated since last DB commit.
+                    # Replace its data with fresh data.
                     segments_updated += 1
-                    segment['id'] = existing['id']
-                    table.update(segment, ['id'])
+                    place_row = existing['id']
+                    segment['id'] = place_row
+                    table_places.update(segment, ['id'])
+                    # Update all categories by deleting and recreating all
+                    # category data for that row.
+                    table_categories.delete(place_id=place_row)
+                    places_row = place_row
+                    needs_categories = True
             else:
                 segments_added += 1
-                table.insert(segment)
+                places_row = table_places.insert(segment)
+                needs_categories = True
+
+            # Insert category data into the place categories table if update is
+            # necessary and category data is present.
+            if needs_categories and segment['startTime'] in segment_categories:
+                categories = segment_categories[segment['startTime']]
+                for category in categories:
+                    table_categories.insert({'place_id': places_row,
+                                             'category': category})
 
         print('Done! Added %s and updated %s segments (out of %s total).' %
               (segments_added, segments_updated, num_segments))
